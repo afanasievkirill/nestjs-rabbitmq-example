@@ -8,7 +8,10 @@ import {
   PASSWORD_ARE_NOT_VALID_ERROR,
   USER_NOT_FOUND_ERROR,
 } from './auth.constants';
-import { RegisterDto } from './auth.controller';
+import {
+  AccountLogin,
+  AccountRegister,
+} from '@nestjs-rabbitmq-example/contacts';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +20,11 @@ export class AuthService {
     private readonly jwtServise: JwtService,
   ) {}
 
-  async register({ email, password, displayName }: RegisterDto) {
+  async register({
+    email,
+    password,
+    displayName,
+  }: AccountRegister.Request): Promise<AccountRegister.Responce> {
     const oldUser = await this.userRepository.findUser(email);
     if (oldUser) {
       throw new Error(EMAIL__ARE_TAKEN_ERROR);
@@ -45,7 +52,7 @@ export class AuthService {
     return { id: user._id };
   }
 
-  async login(id: string) {
+  async login(id: string): Promise<AccountLogin.Responce> {
     return {
       access_token: await this.jwtServise.signAsync({ id }),
     };
